@@ -761,9 +761,19 @@ void GTP::execute(GameState& game, const std::string& xinput) {
         return;
     } else if (command.find("showboard") == 0) {
         gtp_printf(id, "");
+
+        // game.display_state() invokes myprintf(), which prints to stderr and
+        // is silenced by the --quiet flag. Here we temporarily toggle global
+        // flags to make game.display_state() print to stdout and ignore the
+        // --quiet flag.
         set_myprintf_location(stdout);
+        const bool old_cfg_quiet = cfg_quiet;
+        cfg_quiet = false;
+
         game.display_state();
+
         reset_myprintf_location();
+        cfg_quiet = old_cfg_quiet;
         return;
     } else if (command.find("final_score") == 0) {
         float ftmp = game.final_score();
