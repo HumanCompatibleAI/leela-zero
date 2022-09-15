@@ -38,18 +38,17 @@
 #include "Utils.h"
 
 #ifdef _WIN32
-#include <windows.h>
 #else
 #include <pwd.h>
 #include <sys/select.h>
 #include <sys/types.h>
-#include <unistd.h>
 #endif
 
 #include "GTP.h"
 
 Utils::ThreadPool thread_pool;
 
+FILE* myprintf_location = stderr;
 auto constexpr z_entries = 1000;
 std::array<float, z_entries> z_lookup;
 
@@ -124,7 +123,7 @@ static void myprintf_base(const char* const fmt, va_list ap) {
     va_list ap2;
     va_copy(ap2, ap);
 
-    vfprintf(stderr, fmt, ap);
+    vfprintf(myprintf_location, fmt, ap);
 
     if (cfg_logfile_handle) {
         std::lock_guard<std::mutex> lock(IOmutex);
@@ -149,6 +148,14 @@ void Utils::myprintf_error(const char* const fmt, ...) {
     va_start(ap, fmt);
     myprintf_base(fmt, ap);
     va_end(ap);
+}
+
+void Utils::set_myprintf_location(FILE* const file) {
+  myprintf_location = file;
+}
+
+void Utils::reset_myprintf_location() {
+  set_myprintf_location(stderr);
 }
 
 static void gtp_fprintf(FILE* const file, const std::string& prefix,

@@ -34,6 +34,7 @@
 #include <cctype>
 #include <chrono>
 #include <cmath>
+#include <cstdio>
 #include <cstdlib>
 #include <exception>
 #include <fstream>
@@ -760,7 +761,9 @@ void GTP::execute(GameState& game, const std::string& xinput) {
         return;
     } else if (command.find("showboard") == 0) {
         gtp_printf(id, "");
+        set_myprintf_location(stdout);
         game.display_state();
+        reset_myprintf_location();
         return;
     } else if (command.find("final_score") == 0) {
         float ftmp = game.final_score();

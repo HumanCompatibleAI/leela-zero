@@ -36,6 +36,12 @@
 #include <limits>
 #include <string>
 
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <unistd.h>
+#endif
+
 #include "ThreadPool.h"
 
 extern Utils::ThreadPool thread_pool;
@@ -43,6 +49,10 @@ extern Utils::ThreadPool thread_pool;
 namespace Utils {
     void myprintf_error(const char* fmt, ...);
     void myprintf(const char* fmt, ...);
+    // Sets the file to which myprintf prints.
+    void set_myprintf_location(FILE* const file);
+    // Resets the file to which myprintf prints to the default.
+    void reset_myprintf_location();
     void gtp_printf(int id, const char* fmt, ...);
     void gtp_printf_raw(const char* fmt, ...);
     void gtp_fail_printf(int id, const char* fmt, ...);
