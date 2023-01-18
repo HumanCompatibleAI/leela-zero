@@ -147,6 +147,9 @@ static void parse_commandline(const int argc, const char* const argv[]) {
                        "Requires --noponder.")
         ("visits,v", po::value<int>(),
                      "Weaken engine by limiting the number of visits.")
+        ("timelimit", po::value<int>(),
+                      "Time limit in centiseconds.\n"
+                      "0 means infinite time and requires --playouts or --visits.")
         ("lagbuffer,b", po::value<int>()->default_value(cfg_lagbuffer_cs),
                         "Safety margin for time usage in centiseconds.")
         ("resignpct,r", po::value<int>()->default_value(cfg_resignpct),
@@ -418,6 +421,17 @@ static void parse_commandline(const int argc, const char* const argv[]) {
         }
     }
 
+    if (vm.count("timelimit")) {
+      cfg_time_limit = vm["timelimit"].as<int>();
+      if (cfg_time_limit == 0
+          && cfg_max_playouts == UCTSearch::UNLIMITED_PLAYOUTS
+          && cfg_max_visits == UCTSearch::ULIMITED_PLAYOUTS) {
+        printf("--timelimit 0 is not allowed unless --playouts or --visits "
+               "are specified.\n");
+        exit(EXIT_FAILURE);
+      }
+    }
+
     if (vm.count("resignpct")) {
         cfg_resignpct = vm["resignpct"].as<int>();
     }
@@ -551,7 +565,10 @@ int main(int argc, char* argv[]) {
 
     init_global_objects();
 
+    // TODO muck with timecontrol here?
+    // game.set_timecontrol(maintime * 100, byotime * 100, byostones, 0);
     auto maingame = std::make_unique<GameState>();
+    game.set_time_control(cfg_time_limit, 0, 0, 0);
 
     /* set board limits */
     maingame->init_game(BOARD_SIZE, KOMI);
