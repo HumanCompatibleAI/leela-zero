@@ -425,7 +425,7 @@ static void parse_commandline(const int argc, const char* const argv[]) {
       cfg_time_limit = vm["timelimit"].as<int>();
       if (cfg_time_limit == 0
           && cfg_max_playouts == UCTSearch::UNLIMITED_PLAYOUTS
-          && cfg_max_visits == UCTSearch::ULIMITED_PLAYOUTS) {
+          && cfg_max_visits == UCTSearch::UNLIMITED_PLAYOUTS) {
         printf("--timelimit 0 is not allowed unless --playouts or --visits "
                "are specified.\n");
         exit(EXIT_FAILURE);
@@ -565,10 +565,13 @@ int main(int argc, char* argv[]) {
 
     init_global_objects();
 
-    // TODO muck with timecontrol here?
-    // game.set_timecontrol(maintime * 100, byotime * 100, byostones, 0);
     auto maingame = std::make_unique<GameState>();
-    game.set_time_control(cfg_time_limit, 0, 0, 0);
+    if (cfg_time_limit == 0) {
+      // Infinite time limit.
+      maingame.set_timecontrol(0, 1, 0, 0);
+    } else {
+      maingame.set_timecontrol(cfg_time_limit, 0, 0, 0);
+    }
 
     /* set board limits */
     maingame->init_game(BOARD_SIZE, KOMI);
