@@ -65,6 +65,7 @@ unsigned int cfg_num_threads;
 unsigned int cfg_batch_size;
 int cfg_max_playouts;
 int cfg_max_visits;
+int cfg_time_limit;
 size_t cfg_max_memory;
 size_t cfg_max_tree_size;
 int cfg_max_cache_ratio_percent;
