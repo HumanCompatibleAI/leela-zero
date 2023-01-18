@@ -568,9 +568,9 @@ int main(int argc, char* argv[]) {
     auto maingame = std::make_unique<GameState>();
     if (cfg_time_limit == 0) {
       // Infinite time limit.
-      maingame.set_timecontrol(0, 1, 0, 0);
+      maingame->set_timecontrol(0, 1, 0, 0);
     } else {
-      maingame.set_timecontrol(cfg_time_limit, 0, 0, 0);
+      maingame->set_timecontrol(cfg_time_limit, 0, 0, 0);
     }
 
     /* set board limits */
